@@ -1,0 +1,705 @@
+:root {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --border: #e3e6ec;
+  --text: #14181f;
+  --muted: #6b7280;
+  --accent: #b3122b;
+  --accent-soft: #fdf0f2;
+  --green: #0f7a4a;
+  --green-soft: #eefaf3;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+.shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+header.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 14px;
+  margin-bottom: 24px;
+}
+
+header.top h1 {
+  font-size: 19px;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+header.top nav {
+  display: flex;
+  gap: 14px;
+  margin-left: auto;
+}
+
+header.top nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  padding-bottom: 2px;
+}
+
+header.top nav a:hover {
+  color: var(--text);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.panel h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.panel p.sub {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn:hover {
+  border-color: #c9cfda;
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn.primary:hover {
+  background: #8f0e22;
+}
+
+.btn.small {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 0 10px 9px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #f0f2f5;
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+td.num,
+th.num {
+  text-align: right;
+}
+
+.item-name {
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+input[type="number"],
+input[type="text"],
+input[type="date"] {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  color: inherit;
+  background: #fff;
+}
+
+input:focus {
+  outline: 2px solid #c9d4ef;
+  outline-offset: -1px;
+  border-color: #9db2e0;
+}
+
+input.qty {
+  width: 84px;
+  text-align: right;
+}
+
+.progress {
+  min-width: 120px;
+}
+
+.bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #eceff4;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.bar > span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+}
+
+.bar.over > span {
+  background: #0a5f39;
+}
+
+.progress small {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.flash {
+  background: var(--green-soft);
+  border: 1px solid #bce3ce;
+  color: var(--green);
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.headline {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.headline-main,
+.headline-side {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.headline-v {
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 2px 0 10px;
+}
+
+.headline-v.small {
+  font-size: 26px;
+}
+
+.headline-v .of {
+  font-size: 20px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.bar.big {
+  height: 10px;
+}
+
+.stat.box.full {
+  border-color: #bce3ce;
+  background: var(--green-soft);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.stat .k {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.stat .v {
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.stat .of {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.stat .v .of {
+  font-size: 15px;
+}
+
+/* The necessary quantity is the number that matters — give it weight. */
+td.target {
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* Each quantity input carries its target underneath. */
+.log-table td.num .qty {
+  display: block;
+  margin-left: auto;
+}
+
+.log-table td.num small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+tfoot td {
+  border-top: 2px solid var(--border);
+  padding-top: 12px;
+  font-weight: 600;
+}
+
+.pill.done {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.flash.error {
+  background: var(--accent-soft);
+  border-color: #f0c3cb;
+  color: var(--accent);
+}
+
+.met {
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* Per-market packing cells stack the input above its running total. */
+.pack-table td.num .qty {
+  display: block;
+  margin-left: auto;
+}
+
+.pack-table td.num small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.alloc-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.alloc-row:last-child {
+  border-bottom: none;
+}
+
+.alloc-name {
+  flex: 0 0 140px;
+  align-self: center;
+}
+
+.alloc-field {
+  flex: 0 0 110px;
+}
+
+.alloc-field input {
+  width: 100%;
+}
+
+.alloc-sum {
+  align-self: center;
+  font-size: 13px;
+  color: var(--green);
+  white-space: nowrap;
+  min-width: 78px;
+}
+
+.alloc-sum.off {
+  color: var(--accent);
+}
+
+.btn.danger {
+  color: var(--accent);
+  border-color: #f0c3cb;
+}
+
+.btn.danger:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.filament-form {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr auto 0.8fr 0.9fr auto;
+  gap: 10px 12px;
+  align-items: end;
+}
+
+.filament-row {
+  display: grid;
+  grid-template-columns: auto 1.4fr 1.2fr 90px 100px 70px auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+}
+
+.filament-row .qty {
+  width: 100%;
+  text-align: right;
+}
+
+/* The native colour input is small and inconsistent across browsers, so a
+   swatch sits behind it as the thing you actually see. */
+.swatch-wrap {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 34px;
+}
+
+.swatch {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  pointer-events: none;
+}
+
+.swatch-wrap input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+input[type="color"] {
+  width: 46px;
+  height: 38px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.row-value {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.pill {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.week-heading {
+  font-size: 14px;
+  font-weight: 600;
+  padding-top: 18px;
+}
+
+@media (max-width: 720px) {
+  .grid-form {
+    grid-template-columns: 1fr;
+  }
+
+  /* 16px keeps iOS from zooming in when a field is focused. */
+  input[type="number"],
+  input[type="text"],
+  input[type="date"] {
+    font-size: 16px;
+  }
+
+  /* The weekly log has too many columns for a phone, so each item becomes a
+     card with its column headings inlined as labels. */
+  .log-table thead {
+    display: none;
+  }
+
+  .log-table,
+  .log-table tbody,
+  .log-table tr,
+  .log-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .log-table tr {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .log-table td {
+    border: none;
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    text-align: left;
+  }
+
+  .log-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 13px;
+    flex: none;
+  }
+
+  .log-table td.name-cell {
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .log-table td.name-cell .item-name {
+    font-size: 16px;
+  }
+
+  .log-table td.progress {
+    display: block;
+  }
+
+  .log-table td.progress::before {
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .log-table input.qty {
+    width: 120px;
+  }
+
+  .headline {
+    grid-template-columns: 1fr;
+  }
+
+  .headline-v {
+    font-size: 32px;
+  }
+
+  .log-table input[type="text"] {
+    max-width: 60%;
+  }
+
+  .log-table td.num .qty {
+    display: inline-block;
+    margin-left: 0;
+    width: 90px;
+  }
+
+  .log-table td.num small {
+    display: inline-block;
+    margin: 0 0 0 10px;
+  }
+
+  /* Same card treatment for the per-market packing grid. */
+  .pack-table thead {
+    display: none;
+  }
+
+  .pack-table,
+  .pack-table tbody,
+  .pack-table tr,
+  .pack-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .pack-table tr {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .pack-table td {
+    border: none;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    text-align: left;
+  }
+
+  .pack-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .pack-table td.name-cell {
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pack-table td.name-cell .item-name {
+    font-size: 16px;
+  }
+
+  .pack-table td.num .qty {
+    display: inline-block;
+    margin-left: 0;
+    width: 90px;
+  }
+
+  .pack-table td.num small {
+    display: inline-block;
+    margin: 0 0 0 10px;
+  }
+
+  .alloc-name {
+    flex: 1 0 100%;
+  }
+
+  .alloc-field {
+    flex: 1 1 80px;
+  }
+
+  .filament-form,
+  .filament-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filament-row .swatch-wrap {
+    grid-column: 1 / -1;
+  }
+
+  .row-value {
+    text-align: left;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions .btn {
+    justify-content: center;
+    padding: 12px;
+    font-size: 16px;
+  }
+}

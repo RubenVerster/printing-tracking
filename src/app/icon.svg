@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!--
+    Santa hat: cone sweeping up and flopping right into a pom-pom, with a fur
+    band across the base. The white parts carry a faint grey edge so the band
+    still reads against a light browser tab.
+  -->
+  <path d="M8 47 C8 22 19 5 33 5 C46 5 54 12 53 20 C52 26 47 30 42 29 C36 28 34 34 35 41 L36 47 Z"
+        fill="#c1121f"/>
+  <circle cx="52" cy="18" r="9" fill="#fdfdfd" stroke="#d4d7dd" stroke-width="1.2"/>
+  <rect x="3" y="43" width="44" height="15" rx="7.5"
+        fill="#fdfdfd" stroke="#d4d7dd" stroke-width="1.2"/>
+</svg>
