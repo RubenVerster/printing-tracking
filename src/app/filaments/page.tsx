@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { addFilament, deleteFilament, updateFilament } from "../actions";
 import { getFilaments } from "@/lib/data";
 
@@ -23,10 +24,20 @@ const TYPES = [
 export default async function FilamentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ added?: string; saved?: string; deleted?: string; error?: string }>;
+  searchParams: Promise<{
+    added?: string;
+    saved?: string;
+    deleted?: string;
+    error?: string;
+    confirm?: string;
+  }>;
 }) {
   const params = await searchParams;
   const filaments = await getFilaments();
+  // Deleting is a two-step: the Delete button links back here with ?confirm=<id>,
+  // which swaps that row into a confirm state. No accidental taps, and it works
+  // without any client-side JavaScript.
+  const confirmingId = Number.parseInt(String(params.confirm ?? ""), 10);
 
   const spools = filaments.reduce((t, f) => t + f.quantity, 0);
   const value = filaments.reduce(
@@ -118,30 +129,54 @@ export default async function FilamentsPage({
                 </tr>
               </thead>
               <tbody>
-                {filaments.map((f) => (
-                  <tr key={f.id}>
-                    <td colSpan={7} style={{ padding: 0 }}>
-                      <form action={updateFilament} className="filament-row">
-                        <input type="hidden" name="id" value={f.id} />
-                        <span className="swatch-wrap">
-                          <span className="swatch" style={{ background: f.color }} />
-                          <input type="color" name="color" defaultValue={f.color} />
-                        </span>
-                        <input type="text" name="brand" defaultValue={f.brand} placeholder="Brand" />
-                        <input type="text" name="type" defaultValue={f.type} list="filament-types" placeholder="Type" />
-                        <input className="qty" type="number" inputMode="numeric" min="0" step="1" name="quantity" defaultValue={f.quantity} />
-                        <input className="qty" type="number" inputMode="decimal" min="0" step="0.01" name="price" defaultValue={Number(f.price).toFixed(2)} />
-                        <span className="row-value">
-                          R{(f.quantity * Number(f.price)).toFixed(0)}
-                        </span>
-                        <button className="btn small" type="submit">Save</button>
-                        <button className="btn small danger" type="submit" formAction={deleteFilament}>
-                          Delete
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ))}
+                {filaments.map((f) => {
+                  const confirming = f.id === confirmingId;
+                  const label =
+                    [f.brand, f.type].filter(Boolean).join(" ") || "this filament";
+                  return (
+                    <tr key={f.id} id={`f-${f.id}`}>
+                      <td colSpan={7} style={{ padding: 0 }}>
+                        <form
+                          action={updateFilament}
+                          className={`filament-row${confirming ? " confirming" : ""}`}
+                        >
+                          <input type="hidden" name="id" value={f.id} />
+                          <span className="swatch-wrap">
+                            <span className="swatch" style={{ background: f.color }} />
+                            <input type="color" name="color" defaultValue={f.color} disabled={confirming} />
+                          </span>
+                          <input type="text" name="brand" defaultValue={f.brand} placeholder="Brand" disabled={confirming} />
+                          <input type="text" name="type" defaultValue={f.type} list="filament-types" placeholder="Type" disabled={confirming} />
+                          <input className="qty" type="number" inputMode="numeric" min="0" step="1" name="quantity" defaultValue={f.quantity} disabled={confirming} />
+                          <input className="qty" type="number" inputMode="decimal" min="0" step="0.01" name="price" defaultValue={Number(f.price).toFixed(2)} disabled={confirming} />
+                          {confirming ? (
+                            <>
+                              <span className="confirm-text">
+                                Delete {label}?
+                              </span>
+                              <button className="btn small danger solid" type="submit" formAction={deleteFilament}>
+                                Yes, delete
+                              </button>
+                              <Link className="btn small" href="/filaments">
+                                Cancel
+                              </Link>
+                            </>
+                          ) : (
+                            <>
+                              <span className="row-value">
+                                R{(f.quantity * Number(f.price)).toFixed(0)}
+                              </span>
+                              <button className="btn small" type="submit">Save</button>
+                              <Link className="btn small danger" href={`/filaments?confirm=${f.id}#f-${f.id}`}>
+                                Delete
+                              </Link>
+                            </>
+                          )}
+                        </form>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

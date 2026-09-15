@@ -83,7 +83,7 @@ restarts — `docker compose down -v` wipes it.
 | Page | What it does |
 | --- | --- |
 | **Dashboard** (`/`) | Overall packed and printed against the 555 needed, a fill card per market box, and one editable table: printed per item plus what is in each box. |
-| **Filament** (`/filaments`) | Filament stock: brand, type, colour, quantity and price, with full add / edit / delete. Shows spools on hand, total stock value and how many types you carry. |
+| **Filament** (`/filaments`) | Filament stock: brand, type, colour, quantity and price, with full add / edit / delete (deleting asks to confirm first). Shows spools on hand, total stock value and how many types you carry. |
 | **Items** (`/items`) | Add, edit and archive items. Changing an item's necessary quantity re-splits it evenly across the markets. The *Market allocation* panel edits each market's share by hand and flags when the three no longer sum to the necessary quantity; **Even split** puts one back to thirds. |
 
 

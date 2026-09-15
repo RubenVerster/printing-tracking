@@ -439,6 +439,39 @@ tfoot td {
   align-items: end;
 }
 
+.filament-row.confirming {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  /* The confirm message needs real room, so let it size to its content and
+     take the space back from the (now inert) text fields. */
+  grid-template-columns: auto 1fr 1fr 70px 80px auto auto auto;
+}
+
+/* Fields are inert while confirming so nothing can be edited mid-decision. */
+.filament-row.confirming input:disabled {
+  opacity: 0.55;
+  background: #fff;
+}
+
+.confirm-text {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.btn.danger.solid {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn.danger.solid:hover {
+  background: #8f0e22;
+  border-color: #8f0e22;
+}
+
 .filament-row {
   display: grid;
   grid-template-columns: auto 1.4fr 1.2fr 90px 100px 70px auto auto;
@@ -680,7 +713,40 @@ input[type="color"] {
   }
 
   .filament-form,
-  .filament-row {
+  .filament-row.confirming {
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  /* The confirm message needs real room, so let it size to its content and
+     take the space back from the (now inert) text fields. */
+  grid-template-columns: auto 1fr 1fr 70px 80px auto auto auto;
+}
+
+/* Fields are inert while confirming so nothing can be edited mid-decision. */
+.filament-row.confirming input:disabled {
+  opacity: 0.55;
+  background: #fff;
+}
+
+.confirm-text {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.btn.danger.solid {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn.danger.solid:hover {
+  background: #8f0e22;
+  border-color: #8f0e22;
+}
+
+.filament-row {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -688,7 +754,8 @@ input[type="color"] {
     grid-column: 1 / -1;
   }
 
-  .row-value {
+  .row-value,
+  .confirm-text {
     text-align: left;
   }
 
