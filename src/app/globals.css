@@ -439,20 +439,6 @@ tfoot td {
   align-items: end;
 }
 
-.filament-row.confirming {
-  background: var(--accent-soft);
-  border-radius: var(--radius);
-  /* The confirm message needs real room, so let it size to its content and
-     take the space back from the (now inert) text fields. */
-  grid-template-columns: auto 1fr 1fr 70px 80px auto auto auto;
-}
-
-/* Fields are inert while confirming so nothing can be edited mid-decision. */
-.filament-row.confirming input:disabled {
-  opacity: 0.55;
-  background: #fff;
-}
-
 .confirm-text {
   font-size: 13px;
   color: var(--accent);
@@ -470,19 +456,6 @@ tfoot td {
 .btn.danger.solid:hover {
   background: #8f0e22;
   border-color: #8f0e22;
-}
-
-.filament-row {
-  display: grid;
-  grid-template-columns: auto 1.4fr 1.2fr 90px 100px 70px auto auto;
-  gap: 10px;
-  align-items: center;
-  padding: 10px;
-}
-
-.filament-row .qty {
-  width: 100%;
-  text-align: right;
 }
 
 /* The native colour input is small and inconsistent across browsers, so a
@@ -528,6 +501,111 @@ input[type="color"] {
   color: var(--muted);
   text-align: right;
   white-space: nowrap;
+}
+
+.confirm-text {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.btn.danger.solid {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn.danger.solid:hover {
+  background: #8f0e22;
+  border-color: #8f0e22;
+}
+
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 12px;
+  padding: 12px 0 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+
+.filterbar .field {
+  min-width: 150px;
+}
+
+.filterbar select,
+.filterbar input[type="search"] {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  color: inherit;
+  background: #fff;
+}
+
+/* Column headings double as sort controls. */
+th .sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: inherit;
+  white-space: nowrap;
+}
+
+th .sort:hover {
+  color: var(--text);
+}
+
+th .sort.active {
+  color: var(--accent);
+}
+
+th .sort .arrow {
+  font-size: 9px;
+}
+
+.stock-table td {
+  vertical-align: middle;
+}
+
+.stock-table input[type="text"],
+.stock-table input[type="number"] {
+  width: 100%;
+  min-width: 70px;
+}
+
+.stock-table .qty {
+  text-align: right;
+}
+
+.stock-table tr.confirming {
+  background: var(--accent-soft);
+}
+
+.stock-table tr.confirming input:disabled {
+  opacity: 0.55;
+  background: #fff;
+}
+
+/* Stays a real table cell — flex here would drop the row's bottom border. */
+.row-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.row-actions > * + * {
+  margin-left: 8px;
+}
+
+/* The row forms only carry hidden fields; the visible inputs live in the
+   table and point here via their form attribute. */
+.row-form {
+  display: none;
 }
 
 .empty {
@@ -712,46 +790,13 @@ input[type="color"] {
     flex: 1 1 80px;
   }
 
-  .filament-form,
-  .filament-row.confirming {
-  background: var(--accent-soft);
-  border-radius: var(--radius);
-  /* The confirm message needs real room, so let it size to its content and
-     take the space back from the (now inert) text fields. */
-  grid-template-columns: auto 1fr 1fr 70px 80px auto auto auto;
-}
-
-/* Fields are inert while confirming so nothing can be edited mid-decision. */
-.filament-row.confirming input:disabled {
-  opacity: 0.55;
-  background: #fff;
-}
-
-.confirm-text {
-  font-size: 13px;
-  color: var(--accent);
-  font-weight: 600;
-  text-align: right;
-  white-space: nowrap;
-}
-
-.btn.danger.solid {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-
-.btn.danger.solid:hover {
-  background: #8f0e22;
-  border-color: #8f0e22;
-}
-
-.filament-row {
+  .filament-form {
     grid-template-columns: 1fr 1fr;
   }
 
-  .filament-row .swatch-wrap {
-    grid-column: 1 / -1;
+  .filterbar .field {
+    min-width: 0;
+    flex: 1 1 130px;
   }
 
   .row-value,

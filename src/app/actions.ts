@@ -216,6 +216,24 @@ export async function setArchived(formData: FormData) {
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
+/**
+ * Rebuilds the filter query string a row was edited under, so saving or
+ * deleting returns you to the same filtered view instead of the full list.
+ * Only known keys survive, so nothing arbitrary reaches the redirect.
+ */
+const FILTER_KEYS = ["brand", "type", "q", "sort", "dir"] as const;
+
+function filterQuery(formData: FormData, flag: string): string {
+  const raw = new URLSearchParams(String(formData.get("qs") ?? ""));
+  const out = new URLSearchParams();
+  for (const key of FILTER_KEYS) {
+    const value = raw.get(key);
+    if (value) out.set(key, value.slice(0, 80));
+  }
+  out.set(flag, "1");
+  return `?${out.toString()}`;
+}
+
 function filamentFields(formData: FormData) {
   const color = String(formData.get("color") ?? "").trim();
   return {
@@ -233,7 +251,7 @@ function filamentFields(formData: FormData) {
 
 export async function addFilament(formData: FormData) {
   const f = filamentFields(formData);
-  if (!f.type && !f.brand) redirect("/filaments?error=empty");
+  if (!f.type && !f.brand) redirect(`/filaments${filterQuery(formData, "error")}`);
 
   await query(
     `INSERT INTO filaments (brand, type, color, quantity, price)
@@ -242,7 +260,7 @@ export async function addFilament(formData: FormData) {
   );
 
   revalidatePath("/filaments");
-  redirect("/filaments?added=1");
+  redirect(`/filaments${filterQuery(formData, "added")}`);
 }
 
 export async function updateFilament(formData: FormData) {
@@ -259,7 +277,7 @@ export async function updateFilament(formData: FormData) {
   );
 
   revalidatePath("/filaments");
-  redirect("/filaments?saved=1");
+  redirect(`/filaments${filterQuery(formData, "saved")}`);
 }
 
 export async function deleteFilament(formData: FormData) {
@@ -269,5 +287,5 @@ export async function deleteFilament(formData: FormData) {
   await query(`DELETE FROM filaments WHERE id = $1`, [id]);
 
   revalidatePath("/filaments");
-  redirect("/filaments?deleted=1");
+  redirect(`/filaments${filterQuery(formData, "deleted")}`);
 }

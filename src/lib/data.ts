@@ -145,10 +145,71 @@ export type Filament = {
   price: string;
 };
 
-export async function getFilaments(): Promise<Filament[]> {
+/** Whitelisted sort columns — the key comes from the URL, the value does not. */
+const FILAMENT_SORTS: Record<string, string> = {
+  brand: "brand",
+  type: "type",
+  color: "color",
+  quantity: "quantity",
+  price: "price",
+  value: "quantity * price",
+};
+
+export type FilamentFilter = {
+  brand?: string;
+  type?: string;
+  q?: string;
+  sort?: string;
+  dir?: string;
+};
+
+export function filamentSortColumn(sort?: string): string {
+  return sort && sort in FILAMENT_SORTS ? sort : "brand";
+}
+
+export async function getFilaments(
+  filter: FilamentFilter = {}
+): Promise<Filament[]> {
+  const where: string[] = [];
+  const params: unknown[] = [];
+
+  if (filter.brand) {
+    params.push(filter.brand);
+    where.push(`brand = $${params.length}`);
+  }
+  if (filter.type) {
+    params.push(filter.type);
+    where.push(`type = $${params.length}`);
+  }
+  if (filter.q) {
+    params.push(`%${filter.q}%`);
+    where.push(`(brand ILIKE $${params.length} OR type ILIKE $${params.length})`);
+  }
+
+  const column = FILAMENT_SORTS[filamentSortColumn(filter.sort)];
+  const direction = filter.dir === "desc" ? "DESC" : "ASC";
+
   return query<Filament>(
     `SELECT id, brand, type, color, quantity, price
        FROM filaments
-      ORDER BY brand, type, id`
+      ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
+      ORDER BY ${column} ${direction}, id`,
+    params
   );
+}
+
+/** Distinct values for the filter dropdowns, ignoring any active filter. */
+export async function getFilamentFacets(): Promise<{
+  brands: string[];
+  types: string[];
+}> {
+  const [brands, types] = await Promise.all([
+    query<{ v: string }>(
+      `SELECT DISTINCT brand AS v FROM filaments WHERE brand <> '' ORDER BY v`
+    ),
+    query<{ v: string }>(
+      `SELECT DISTINCT type AS v FROM filaments WHERE type <> '' ORDER BY v`
+    ),
+  ]);
+  return { brands: brands.map((r) => r.v), types: types.map((r) => r.v) };
 }
