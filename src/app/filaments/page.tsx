@@ -112,7 +112,10 @@ export default async function FilamentsPage({
 
       <div className="panel">
         <h2>Add filament</h2>
-        <p className="sub">Brand and type are free text; the list is only suggestions.</p>
+        <p className="sub">
+          Brand and type are free text; the list is only suggestions. Price
+          defaults to 300 a roll.
+        </p>
         <form action={addFilament} className="filament-form">
           <input type="hidden" name="qs" value={queryString} />
           <div className="field">
@@ -133,7 +136,8 @@ export default async function FilamentsPage({
           </div>
           <div className="field">
             <label htmlFor="price-new">Price</label>
-            <input id="price-new" name="price" type="number" inputMode="decimal" min="0" step="0.01" placeholder="0" />
+            {/* A roll is 300 as a rule; override it when it isn't. */}
+            <input id="price-new" name="price" type="number" inputMode="decimal" min="0" step="0.01" defaultValue="300" />
           </div>
           <button className="btn primary" type="submit">Add</button>
         </form>
