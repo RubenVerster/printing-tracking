@@ -234,7 +234,7 @@ export default async function DashboardPage({
               </div>
 
               <div className="actions">
-                <button className="btn primary" type="submit">
+                <button className="btn save" type="submit">
                   Save
                 </button>
                 <span className="muted" style={{ fontSize: 13 }}>
@@ -242,6 +242,15 @@ export default async function DashboardPage({
                   at the same time.
                 </span>
               </div>
+
+              {/* Same form, same action — just always within reach. */}
+              <button
+                className="btn save save-float"
+                type="submit"
+                form="board-form"
+              >
+                Save
+              </button>
             </>
           )}
         </div>

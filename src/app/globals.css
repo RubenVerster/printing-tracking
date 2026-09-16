@@ -6,6 +6,8 @@
   --muted: #6b7280;
   --accent: #b3122b;
   --accent-soft: #fdf0f2;
+  --blue: #1257b8;
+  --blue-dark: #0e4694;
   --green: #0f7a4a;
   --green-soft: #eefaf3;
   --radius: 10px;
@@ -36,7 +38,8 @@ a {
 .shell {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 24px 16px 64px;
+  /* Bottom padding leaves room for the floating Save button. */
+  padding: 24px 16px 96px;
 }
 
 header.top {
@@ -118,6 +121,30 @@ header.top nav a:hover {
 
 .btn.primary:hover {
   background: #8f0e22;
+}
+
+.btn.save {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.btn.save:hover {
+  background: var(--blue-dark);
+  border-color: var(--blue-dark);
+}
+
+/* A second Save that stays reachable without scrolling back up. Submits the
+   same form via the form attribute, so it needs no logic of its own. */
+.save-float {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 50;
+  padding: 12px 20px;
+  font-size: 15px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(18, 87, 184, 0.32);
 }
 
 .btn.small {
