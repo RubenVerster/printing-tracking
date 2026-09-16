@@ -14,8 +14,13 @@ CREATE TABLE IF NOT EXISTS items (
     necessary_qty INTEGER        NOT NULL DEFAULT 0,
     sort_order    INTEGER        NOT NULL DEFAULT 0,
     archived      BOOLEAN        NOT NULL DEFAULT FALSE,
+    -- Set on a sub-item (e.g. Mini Muelo under Minis). The parent holds the
+    -- necessary quantity and market split; children hold the actual work.
+    parent_id     INTEGER        REFERENCES items (id) ON DELETE CASCADE,
     created_at    TIMESTAMPTZ    NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS items_parent_idx ON items (parent_id);
 
 CREATE TABLE IF NOT EXISTS markets (
     id         SERIAL PRIMARY KEY,

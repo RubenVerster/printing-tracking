@@ -18,6 +18,16 @@ The necessary quantity is split across three boxes — **Edgemead**,
 to the earlier markets so the three shares always add back up to the total
 (65 becomes 22 / 22 / 21). Override any share by hand on the Items page.
 
+An item can hold **sub-items** — variants such as Mini Muelo or Turtle inside
+Minis or Biggies. A category with sub-items is no longer typed into directly:
+its printed and packed figures become the sum of its sub-items, so there is one
+place to log and no double counting. The category keeps the necessary quantity
+and the market split, and its sub-items count towards those same targets.
+
+When a category gains its *first* sub-item, anything already logged against the
+category is moved onto that sub-item, so the totals never silently drop.
+Re-attribute it from the dashboard if it belonged to a different variant.
+
 The two halves of the work are tracked differently:
 
 - **Printing is bulk.** One running total per item, covering all markets.
@@ -84,7 +94,7 @@ restarts — `docker compose down -v` wipes it.
 | --- | --- |
 | **Dashboard** (`/`) | Overall packed and printed against the 555 needed, a fill card per market box, and one editable table: printed per item plus what is in each box. |
 | **Filament** (`/filaments`) | Filament stock: brand, type, colour, quantity and price, with full add / edit / delete (deleting asks to confirm first). Filter by brand, type or a text search, and sort by any column; the filter survives editing, and totals reflect what is shown. Shows spools on hand, total stock value and how many types you carry. |
-| **Items** (`/items`) | Add, edit and archive items. Changing an item's necessary quantity re-splits it evenly across the markets. The *Market allocation* panel edits each market's share by hand and flags when the three no longer sum to the necessary quantity; **Even split** puts one back to thirds. |
+| **Items** (`/items`) | Add, edit and archive items, and manage sub-items under any item. Changing an item's necessary quantity re-splits it evenly across the markets. The *Market allocation* panel edits each market's share by hand and flags when the three no longer sum to the necessary quantity; **Even split** puts one back to thirds. |
 
 
 ## Data model
@@ -99,6 +109,7 @@ docker compose exec -T db psql -U xmas -d xmas -v ON_ERROR_STOP=1 < db/init/004_
 
 - `items` — description, price, print_qty (submitted), necessary_qty (the
   target progress is measured against), sort_order, archived
+- `items.parent_id` — set on a sub-item; the parent holds the targets
 - `markets` — Edgemead, Tygervalley, Capegate
 - `item_market_targets` — each market's share of an item, unique on
   `(item_id, market_id)`; the three rows are expected to sum to necessary_qty

@@ -1,5 +1,7 @@
 import {
   addItem,
+  addSubItem,
+  deleteSubItem,
   resetTargets,
   saveTargets,
   setArchived,
@@ -20,8 +22,11 @@ export default async function ItemsPage({
     getMarkets(),
     getTargetsByItem(),
   ]);
-  const active = items.filter((i) => !i.archived);
-  const archived = items.filter((i) => i.archived);
+  const active = items.filter((i) => !i.archived && i.parent_id === null);
+  const archived = items.filter((i) => i.archived && i.parent_id === null);
+  const subItems = items.filter((i) => i.parent_id !== null);
+  const childrenOf = (parentId: number) =>
+    subItems.filter((i) => i.parent_id === parentId);
 
   return (
     <>
@@ -131,6 +136,58 @@ export default async function ItemsPage({
           </table>
         </div>
         {active.length === 0 ? <p className="empty">No active items.</p> : null}
+      </div>
+
+      <div className="panel" id="sub-items">
+        <h2>Sub-items</h2>
+        <p className="sub">
+          Variants that live inside an item — Mini Muelo under Minis, and so on.
+          A category with sub-items is no longer typed into directly on the
+          dashboard: its printed and packed figures become the sum of its
+          sub-items, counting towards the same market targets.
+        </p>
+        {params.error === "subitem" ? (
+          <div className="flash error">Pick a parent and give the sub-item a name.</div>
+        ) : null}
+        <form action={addSubItem} className="filament-form">
+          <div className="field">
+            <label htmlFor="parentId">Belongs to</label>
+            <select id="parentId" name="parentId" defaultValue="">
+              <option value="" disabled>Choose an item</option>
+              {active.map((i) => (
+                <option key={i.id} value={i.id}>{i.description}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="sub-description">Sub-item</label>
+            <input id="sub-description" name="description" type="text" placeholder="e.g. Turtle" required />
+          </div>
+          <button className="btn primary" type="submit">Add sub-item</button>
+        </form>
+
+        {subItems.length === 0 ? (
+          <p className="empty">No sub-items yet.</p>
+        ) : (
+          active
+            .filter((parent) => childrenOf(parent.id).length > 0)
+            .map((parent) => (
+              <div className="sub-group" key={parent.id}>
+                <h3>{parent.description}</h3>
+                <ul className="sub-list">
+                  {childrenOf(parent.id).map((child) => (
+                    <li key={child.id}>
+                      <span>{child.description}</span>
+                      <form action={deleteSubItem}>
+                        <input type="hidden" name="id" value={child.id} />
+                        <button className="btn small danger" type="submit">Remove</button>
+                      </form>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+        )}
       </div>
 
       <div className="panel" id="allocation">

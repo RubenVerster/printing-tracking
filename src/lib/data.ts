@@ -10,6 +10,8 @@ export type ItemRow = {
   necessary_qty: number;
   sort_order: number;
   archived: boolean;
+  /** Set on a sub-item; null on a top-level item. */
+  parent_id: number | null;
 };
 
 /** market id -> quantity */
@@ -23,7 +25,8 @@ export async function getMarkets(): Promise<Market[]> {
 
 export async function getAllItems(): Promise<ItemRow[]> {
   return query<ItemRow>(
-    `SELECT id, description, price, print_qty, necessary_qty, sort_order, archived
+    `SELECT id, description, price, print_qty, necessary_qty, sort_order,
+            archived, parent_id
        FROM items
       ORDER BY archived, sort_order, id`
   );
@@ -57,6 +60,10 @@ export type BoardItem = ItemRow & {
   /** What is in each market's box. */
   packed: ByMarket;
   targets: ByMarket;
+  /** Variants under this item. A parent's own figures are the sum of these. */
+  children: BoardItem[];
+  /** True when this row aggregates children rather than being typed into. */
+  rollup: boolean;
 };
 
 /** Everything the dashboard needs, in one shot. */
@@ -70,6 +77,7 @@ export async function getBoard(): Promise<BoardItem[]> {
               i.necessary_qty,
               i.sort_order,
               i.archived,
+              i.parent_id,
               COALESCE(p.printed, 0) AS printed,
               COALESCE(p.notes, '')  AS notes
          FROM items i
@@ -86,11 +94,39 @@ export async function getBoard(): Promise<BoardItem[]> {
   const packedByItem = groupByItem(packed);
   const empty = (): ByMarket => new Map<number, number>();
 
-  return items.map((item) => ({
-    ...item,
-    packed: packedByItem.get(item.id) ?? empty(),
-    targets: targets.get(item.id) ?? empty(),
-  }));
+  const build = (row: (typeof items)[number]): BoardItem => ({
+    ...row,
+    packed: packedByItem.get(row.id) ?? empty(),
+    targets: targets.get(row.id) ?? empty(),
+    children: [],
+    rollup: false,
+  });
+
+  const byId = new Map(items.map((r) => [r.id, build(r)]));
+  const top: BoardItem[] = [];
+
+  for (const row of items) {
+    const item = byId.get(row.id)!;
+    const parent = row.parent_id ? byId.get(row.parent_id) : undefined;
+    if (parent) parent.children.push(item);
+    else top.push(item);
+  }
+
+  // A parent with children is not typed into — its figures are the sum of them.
+  for (const item of top) {
+    if (item.children.length === 0) continue;
+    item.rollup = true;
+    item.printed = item.children.reduce((t, c) => t + c.printed, 0);
+    const packedTotals = empty();
+    for (const child of item.children) {
+      for (const [marketId, qty] of child.packed) {
+        packedTotals.set(marketId, (packedTotals.get(marketId) ?? 0) + qty);
+      }
+    }
+    item.packed = packedTotals;
+  }
+
+  return top;
 }
 
 export type MarketBox = {
@@ -109,15 +145,23 @@ export async function getMarketBoxes(): Promise<MarketBox[]> {
             COALESCE(p.packed, 0)::int AS packed
        FROM markets m
        LEFT JOIN (
+            -- Targets live on top-level items only.
             SELECT t.market_id, SUM(t.qty) AS target
               FROM item_market_targets t
-              JOIN items i ON i.id = t.item_id AND i.archived = FALSE
+              JOIN items i ON i.id = t.item_id
+                          AND i.archived = FALSE
+                          AND i.parent_id IS NULL
              GROUP BY t.market_id
        ) t ON t.market_id = m.id
        LEFT JOIN (
+            -- Only leaves count: a category's own row would double up with the
+            -- sub-items that make it up.
             SELECT p.market_id, SUM(p.packaged) AS packed
               FROM market_progress p
               JOIN items i ON i.id = p.item_id AND i.archived = FALSE
+              LEFT JOIN items parent ON parent.id = i.parent_id
+             WHERE NOT EXISTS (SELECT 1 FROM items c WHERE c.parent_id = i.id)
+               AND (i.parent_id IS NULL OR parent.archived = FALSE)
              GROUP BY p.market_id
        ) p ON p.market_id = m.id
       ORDER BY m.sort_order, m.id`

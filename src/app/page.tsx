@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { saveProgress } from "./actions";
 import LiveRefresh from "./live-refresh";
+import SubItemsToggle from "./sub-items-toggle";
 import { getBoard, getLastUpdated, getMarketBoxes, getMarkets } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +30,106 @@ export default async function DashboardPage({
   const needed = sum((r) => r.necessary_qty);
   const printed = sum((r) => r.printed);
   const packed = sum((r) => across(r.packed));
+
+  /** A row of inputs, or read-only sums when the item rolls up its children. */
+  const renderRow = (
+    row: (typeof rows)[number],
+    depth: 0 | 1
+  ) => {
+    const target = depth === 0 ? row.necessary_qty || 0 : 0;
+    const printedDone = target > 0 && row.printed >= target;
+    const child = depth === 1;
+    return (
+      <tr
+        key={row.id}
+        className={child ? "sub-row" : undefined}
+        data-parent={child ? row.parent_id ?? undefined : undefined}
+        hidden={child}
+      >
+        <td className="name-cell">
+          {row.rollup ? null : (
+            <>
+              <input type="hidden" name="itemId" value={row.id} />
+              <input type="hidden" name={`was-printed-${row.id}`} value={row.printed} />
+              <input type="hidden" name={`was-notes-${row.id}`} value={row.notes} />
+            </>
+          )}
+          <span className="item-name">{row.description}</span>
+          {row.children.length > 0 ? (
+            <SubItemsToggle parentId={row.id} count={row.children.length} />
+          ) : null}
+        </td>
+        <td className="num muted" data-label="Submitted">
+          {depth === 0 ? row.print_qty || "—" : ""}
+        </td>
+        <td className="num target" data-label="Necessary">
+          {depth === 0 ? target || "—" : ""}
+        </td>
+        <td className="num" data-label="Printed">
+          {row.rollup ? (
+            <span className="rollup" title="Sum of sub-items">Σ {row.printed}</span>
+          ) : (
+            <input
+              className="qty"
+              type="number"
+              inputMode="numeric"
+              min="0"
+              step="1"
+              name={`printed-${row.id}`}
+              defaultValue={row.printed || ""}
+              placeholder="0"
+            />
+          )}
+          {depth === 0 ? (
+            <small className={printedDone ? "met" : "muted"}>of {target}</small>
+          ) : null}
+        </td>
+        {markets.map((m) => {
+          const mTarget = row.targets.get(m.id) ?? 0;
+          const mPacked = row.packed.get(m.id) ?? 0;
+          const met = mTarget > 0 && mPacked >= mTarget;
+          return (
+            <td key={m.id} className="num" data-label={m.name}>
+              {row.rollup ? (
+                <span className="rollup" title="Sum of sub-items">Σ {mPacked}</span>
+              ) : (
+                <>
+                  <input
+                    type="hidden"
+                    name={`was-packed-${row.id}-${m.id}`}
+                    value={mPacked}
+                  />
+                  <input
+                    className="qty"
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    step="1"
+                    name={`packed-${row.id}-${m.id}`}
+                    defaultValue={mPacked || ""}
+                    placeholder="0"
+                  />
+                </>
+              )}
+              {depth === 0 ? (
+                <small className={met ? "met" : "muted"}>of {mTarget}</small>
+              ) : null}
+            </td>
+          );
+        })}
+        <td data-label="Notes">
+          {row.rollup ? null : (
+            <input
+              type="text"
+              name={`notes-${row.id}`}
+              defaultValue={row.notes}
+              placeholder="optional"
+            />
+          )}
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <>
@@ -124,86 +225,10 @@ export default async function DashboardPage({
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((row) => {
-                      const target = row.necessary_qty || 0;
-                      const printedDone = target > 0 && row.printed >= target;
-                      return (
-                        <tr key={row.id}>
-                          <td className="name-cell">
-                            <input type="hidden" name="itemId" value={row.id} />
-                            {/* Baselines, so the save can tell an untouched
-                                field from an edited one. */}
-                            <input
-                              type="hidden"
-                              name={`was-printed-${row.id}`}
-                              value={row.printed}
-                            />
-                            <input
-                              type="hidden"
-                              name={`was-notes-${row.id}`}
-                              value={row.notes}
-                            />
-                            <span className="item-name">{row.description}</span>
-                          </td>
-                          <td className="num muted" data-label="Submitted">
-                            {row.print_qty || "—"}
-                          </td>
-                          <td className="num target" data-label="Necessary">
-                            {target || "—"}
-                          </td>
-                          <td className="num" data-label="Printed">
-                            <input
-                              className="qty"
-                              type="number"
-                              inputMode="numeric"
-                              min="0"
-                              step="1"
-                              name={`printed-${row.id}`}
-                              defaultValue={row.printed || ""}
-                              placeholder="0"
-                            />
-                            <small className={printedDone ? "met" : "muted"}>
-                              of {target}
-                            </small>
-                          </td>
-                          {markets.map((m) => {
-                            const mTarget = row.targets.get(m.id) ?? 0;
-                            const mPacked = row.packed.get(m.id) ?? 0;
-                            const met = mTarget > 0 && mPacked >= mTarget;
-                            return (
-                              <td key={m.id} className="num" data-label={m.name}>
-                                <input
-                                  type="hidden"
-                                  name={`was-packed-${row.id}-${m.id}`}
-                                  value={mPacked}
-                                />
-                                <input
-                                  className="qty"
-                                  type="number"
-                                  inputMode="numeric"
-                                  min="0"
-                                  step="1"
-                                  name={`packed-${row.id}-${m.id}`}
-                                  defaultValue={mPacked || ""}
-                                  placeholder="0"
-                                />
-                                <small className={met ? "met" : "muted"}>
-                                  of {mTarget}
-                                </small>
-                              </td>
-                            );
-                          })}
-                          <td data-label="Notes">
-                            <input
-                              type="text"
-                              name={`notes-${row.id}`}
-                              defaultValue={row.notes}
-                              placeholder="optional"
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {rows.flatMap((row) => [
+                      renderRow(row, 0),
+                      ...row.children.map((c) => renderRow(c, 1)),
+                    ])}
                   </tbody>
                 </table>
               </div>

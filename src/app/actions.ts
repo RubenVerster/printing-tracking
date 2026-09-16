@@ -200,6 +200,67 @@ export async function resetTargets(formData: FormData) {
   redirect("/items#allocation");
 }
 
+/** Adds a variant under an existing item, e.g. Mini Muelo under Minis. */
+export async function addSubItem(formData: FormData) {
+  const parentId = Number.parseInt(String(formData.get("parentId") ?? ""), 10);
+  const description = String(formData.get("description") ?? "").trim();
+  if (!Number.isInteger(parentId) || !description) {
+    redirect("/items?error=subitem#sub-items");
+  }
+
+  await withTransaction(async (run) => {
+    const existing = await run<{ n: string }>(
+      `SELECT COUNT(*)::text AS n FROM items WHERE parent_id = $1`,
+      [parentId]
+    );
+    const isFirst = existing[0]?.n === "0";
+
+    const created = await run<{ id: number }>(
+      `INSERT INTO items (description, price, print_qty, necessary_qty,
+                          sort_order, parent_id)
+       SELECT $2, p.price, 0, 0,
+              COALESCE((SELECT MAX(sort_order) + 1
+                          FROM items WHERE parent_id = $1), 1),
+              p.id
+         FROM items p
+        WHERE p.id = $1 AND p.parent_id IS NULL
+       RETURNING id`,
+      [parentId, description.slice(0, 120)]
+    );
+    if (created.length === 0) return;
+
+    // Once a category has sub-items its own figures stop counting, so anything
+    // already logged against it would silently vanish from the totals. Move it
+    // onto this first sub-item instead; re-attribute it there if it belonged
+    // elsewhere.
+    if (isFirst) {
+      const childId = created[0].id;
+      await run(`UPDATE item_progress SET item_id = $2 WHERE item_id = $1`, [
+        parentId,
+        childId,
+      ]);
+      await run(`UPDATE market_progress SET item_id = $2 WHERE item_id = $1`, [
+        parentId,
+        childId,
+      ]);
+    }
+  });
+
+  revalidatePath("/");
+  redirect("/items#sub-items");
+}
+
+export async function deleteSubItem(formData: FormData) {
+  const id = Number.parseInt(String(formData.get("id") ?? ""), 10);
+  if (!Number.isInteger(id)) redirect("/items#sub-items");
+
+  // Guarded to parent_id so this can never remove a top-level item.
+  await query(`DELETE FROM items WHERE id = $1 AND parent_id IS NOT NULL`, [id]);
+
+  revalidatePath("/");
+  redirect("/items#sub-items");
+}
+
 /** Archived items drop off the dashboard but keep their numbers. */
 export async function setArchived(formData: FormData) {
   const id = Number.parseInt(String(formData.get("id") ?? ""), 10);
